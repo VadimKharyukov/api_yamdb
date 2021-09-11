@@ -6,10 +6,6 @@ DATA_PATH = 'static/data/'
 
 
 class Command(BaseCommand):
-# python manage.py import category.csv Category
-# python manage.py import genre.csv Genre
-# python manage.py import titles.csv Title
-# python manage.py import genre_title.csv GenreTitle
 
     help = 'Import data from project CSV files'
 

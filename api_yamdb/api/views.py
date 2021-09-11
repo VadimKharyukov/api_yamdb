@@ -2,15 +2,16 @@ from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
-from rest_framework import status, viewsets, filters
+from rest_framework import status, viewsets, filters, mixins
 from rest_framework.decorators import api_view, action
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
 from reviews.models import CustomUser
 from reviews.models import Title, Category, Genre
-from .permissions import IsAdminOrSafeMethod, IsAdmin
+from .permissions import IsAdmin, IsAdminOrReadOnly
 from .serializers import (
     TitleSerializer,
     CategorySerializer,
@@ -22,24 +23,39 @@ from .serializers import (
 )
 
 
+class NoPATCHViewSet(
+        mixins.ListModelMixin,
+        mixins.CreateModelMixin,
+        mixins.DestroyModelMixin,
+        viewsets.GenericViewSet):
+    pass
+
+
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
-    serializer_class = TitleSerializer    
-    permission_classes = (IsAdminOrSafeMethod,)
+    serializer_class = TitleSerializer
+    pagination_class = LimitOffsetPagination
+    permission_classes = (IsAdminOrReadOnly,)
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class CategoryViewSet(NoPATCHViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer    
     lookup_field = 'slug'
-    permission_classes = (IsAdminOrSafeMethod,)
+    filter_backends = [filters.SearchFilter]
+    search_fields = ('name', )
+    pagination_class = LimitOffsetPagination
+    permission_classes = (IsAdminOrReadOnly,)
 
 
-class GenreViewSet(viewsets.ModelViewSet):
+class GenreViewSet(NoPATCHViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer   
     lookup_field = 'slug'
-    permission_classes = (IsAdminOrSafeMethod,)
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name', ]
+    pagination_class = LimitOffsetPagination
+    permission_classes = (IsAdminOrReadOnly,)
 
 
 @api_view(['POST'])
