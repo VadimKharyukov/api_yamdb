@@ -4,7 +4,7 @@ from rest_framework.validators import UniqueValidator
 from reviews.models import CustomUser
 
 
-class SingupSerializer(serializers.ModelSerializer):
+class SignupSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=True,
                                    validators=[UniqueValidator(
                                        queryset=CustomUser.objects.all())])
@@ -24,18 +24,18 @@ class TokenSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ('username', 'confirmation_code')
-#
-#
-# class AdminSerializer(serializers.ModelSerializer):
-#     username = serializers.CharField(required=True,
-#                                      validators=[UniqueValidator(
-#                                          queryset=CustomUser.objects.all())])
-#
-#     class Meta:
-#         model = CustomUser
-#         fields = ('username', 'last_name', 'first_name', 'email',
-#                     'role', 'bio')
-#
-#
-# class UserSerializer(AdminSerializer):
-#     role = serializers.CharField(readonly=True)
+
+
+class AdminSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(required=True,
+                                     validators=[UniqueValidator(
+                                         queryset=CustomUser.objects.all())])
+
+    class Meta:
+        model = CustomUser
+        fields = ('username', 'last_name', 'first_name', 'email',
+                  'role', 'bio')
+
+
+class UserSerializer(AdminSerializer):
+    role = serializers.CharField(read_only=True)

@@ -25,10 +25,10 @@ class CustomUser(AbstractUser):
                             choices=UserRoles.choices,
                             max_length=30,
                             default=UserRoles.USER)
-    confirmation_code = models.CharField(max_length=6)
+    confirmation_code = models.CharField(max_length=30)
 
     def __str__(self):
-        return self.email, self.username
+        return self.username
 
     class Meta:
         verbose_name = ''

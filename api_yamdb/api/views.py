@@ -1,23 +1,26 @@
-from rest_framework import status, viewsets
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from .permissions import IsAdmin
-from django.contrib.auth.tokens import default_token_generator
-from django.shortcuts import get_object_or_404
-from django.core.mail import send_mail
 from django.conf import settings
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
+from django.shortcuts import get_object_or_404
+from rest_framework import status, viewsets, filters
+from rest_framework.decorators import api_view, action
+from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework.permissions import IsAuthenticated
+
 from reviews.models import CustomUser
+from .permissions import IsAdmin
 from .serializers import (
-    SingupSerializer,
-    # CustomUserSerializer,
-    TokenSerializer
+    SignupSerializer,
+    AdminSerializer,
+    TokenSerializer,
+    UserSerializer,
 )
 
 
 @api_view(['POST'])
-def singup(request):
-    serializer = SingupSerializer(data=request.data)
+def signup(request):
+    serializer = SignupSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     email = serializer.data.get('email')
     username = serializer.data.get('username')
@@ -28,7 +31,9 @@ def singup(request):
     confirmation_code = default_token_generator.make_token(user)
     send_mail('Вам отправлен код авторизации',
               f'Ваш код {confirmation_code}',
-              settings.DEFAULT_FROM_EMAIL, [email])
+              settings.DEFAULT_FROM_EMAIL,
+              [email],
+              )
     return Response({'email': email, 'username': username})
 
 
@@ -39,15 +44,34 @@ def token(request):
     username = serializer.data.get('username')
     confirmation_code = serializer.data.get('confirmation_code')
     user = get_object_or_404(CustomUser, username=username)
-    token = AccessToken.for_user(user)
     if default_token_generator.check_token(user, confirmation_code):
-        return Response('Ваш токен:',
-                        f'{token}')
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+        user.is_active = True
+        user.save()
+        token_user = AccessToken.for_user(user)
+        return Response({'Ваш токен':
+                        f'{token_user}'}, status=status.HTTP_200_OK)
+    return Response('', status=status.HTTP_400_BAD_REQUEST)
 
-#
-# class CustomUserViewSet(viewsets.ModelViewSet):
-#     serializer_class = AdminSerializer
-#     queryset = CustomUser.objects.all()
-#     permission_classes = (IsAdmin, )
-#     search_fields = ('username',)
+
+class CustomUserViewSet(viewsets.ModelViewSet):
+    serializer_class = AdminSerializer
+    queryset = CustomUser.objects.all()
+    permission_classes = (IsAdmin, )
+    filter_backends = [filters.SearchFilter]
+    lookup_field = 'username'
+    search_fields = ('username',)
+
+    @action(detail=False, methods=['get', 'patch'],
+            permission_classes=[IsAuthenticated])
+    def me(self, request):
+        user = request.user
+        if request.method == 'GET':
+            serializer = UserSerializer(user, many=False)
+            return Response(serializer.data)
+        if request.method == 'PATCH':
+            serializer = UserSerializer(user, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
