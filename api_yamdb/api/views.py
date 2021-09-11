@@ -1,39 +1,25 @@
 from django.conf import settings
-from django.shortcuts import get_object_or_404
-from rest_framework.decorators import api_view
-from rest_framework import filters
-from rest_framework import permissions
-from rest_framework import status, viewsets
-from rest_framework.response import Response
-
-
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
+from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets, filters
 from rest_framework.decorators import api_view, action
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
-from rest_framework.permissions import IsAuthenticated
 
 from reviews.models import CustomUser
-from .permissions import IsAdmin
+from reviews.models import Title, Category, Genre
+from .permissions import IsAdminOrSafeMethod, IsAdmin
 from .serializers import (
+    TitleSerializer,
+    CategorySerializer,
+    GenreSerializer,
     SignupSerializer,
     AdminSerializer,
     TokenSerializer,
     UserSerializer,
 )
-
-from reviews.models import Title, Category, Genre
-from .serializers import (TitleSerializer,
-                          CategorySerializer,
-                          GenreSerializer,
-                          SingupSerializer,
-                          AdminSerializer,
-                          TokenSerializer,
-                          UserSerializer,
-                         )
-from .permissions import IsAdminOrSafeMethod, IsAdmin
 
 
 class TitleViewSet(viewsets.ModelViewSet):

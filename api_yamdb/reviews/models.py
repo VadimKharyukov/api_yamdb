@@ -1,9 +1,7 @@
-from django.core.validators import ValidationError
-from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
-
-from django.contrib.auth import get_user_model
+from django.core.validators import ValidationError
 from django.db import models
+from django.utils import timezone
 
 
 class UserRoles:
@@ -38,10 +36,12 @@ class CustomUser(AbstractUser):
         verbose_name = ''
 
 
-
 class Category(models.Model):
     name = models.CharField(max_length=200, verbose_name='Название')
-    slug = models.SlugField(max_length=50, unique=True, verbose_name='Идентификатор')
+    slug = models.SlugField(max_length=50,
+                            unique=True,
+                            verbose_name='Идентификатор'
+                            )
 
     class Meta:
         verbose_name = 'Категория'

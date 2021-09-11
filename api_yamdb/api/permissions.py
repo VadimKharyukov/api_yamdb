@@ -1,4 +1,7 @@
-from rest_framework.permissions import BasePermission, SAFE_METHODS, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import (BasePermission,
+                                        SAFE_METHODS,
+                                        IsAuthenticatedOrReadOnly
+                                        )
 
 from reviews.models import UserRoles
 

@@ -1,12 +1,7 @@
+from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from django.urls import include, path
-
-from api.views import TitleViewSet, CategoryViewSet, GenreViewSet
-from rest_framework import routers
-
 from .views import *
-
 
 router = DefaultRouter()
 router.register('titles', TitleViewSet)
