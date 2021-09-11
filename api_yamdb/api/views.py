@@ -1,7 +1,14 @@
 from django.conf import settings
+from django.shortcuts import get_object_or_404
+from rest_framework.decorators import api_view
+from rest_framework import filters
+from rest_framework import permissions
+from rest_framework import status, viewsets
+from rest_framework.response import Response
+
+
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
-from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets, filters
 from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
@@ -16,6 +23,37 @@ from .serializers import (
     TokenSerializer,
     UserSerializer,
 )
+
+from reviews.models import Title, Category, Genre
+from .serializers import (TitleSerializer,
+                          CategorySerializer,
+                          GenreSerializer,
+                          SingupSerializer,
+                          AdminSerializer,
+                          TokenSerializer,
+                          UserSerializer,
+                         )
+from .permissions import IsAdminOrSafeMethod, IsAdmin
+
+
+class TitleViewSet(viewsets.ModelViewSet):
+    queryset = Title.objects.all()
+    serializer_class = TitleSerializer    
+    permission_classes = (IsAdminOrSafeMethod,)
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer    
+    lookup_field = 'slug'
+    permission_classes = (IsAdminOrSafeMethod,)
+
+
+class GenreViewSet(viewsets.ModelViewSet):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer   
+    lookup_field = 'slug'
+    permission_classes = (IsAdminOrSafeMethod,)
 
 
 @api_view(['POST'])
