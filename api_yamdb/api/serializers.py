@@ -1,12 +1,9 @@
-from rest_framework.validators import UniqueValidator
 from rest_framework import serializers
+from rest_framework.relations import SlugRelatedField
+from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
 
 from reviews.models import CustomUser
-
-from rest_framework.relations import SlugRelatedField
-from rest_framework.validators import UniqueTogetherValidator
-
-from reviews.models import Title, Category, Genre, GenreTitle
+from reviews.models import Title, Category, Genre
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -56,8 +53,8 @@ class TitleSerializer(serializers.ModelSerializer):
     def get_rating(self, obj):
         return 10
 
-class TitleGetSerializer(serializers.ModelSerializer):
 
+class TitleGetSerializer(serializers.ModelSerializer):
     category = CategorySerializer(required=True)
     genre = GenreSerializer(many=True, required=True)
     rating = serializers.SerializerMethodField()

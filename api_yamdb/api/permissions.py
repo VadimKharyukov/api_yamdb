@@ -13,12 +13,10 @@ class IsAdmin(IsAuthenticatedOrReadOnly):
 
 
 class IsAdminOrReadOnly(BasePermission):
-
     def has_permission(self, request, view):
         if request.method in SAFE_METHODS:
             return True
 
         if request.user.is_authenticated:
             return request.user.role == UserRoles.ADMIN
-
         return False
