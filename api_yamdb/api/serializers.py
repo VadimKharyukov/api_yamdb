@@ -56,6 +56,19 @@ class TitleSerializer(serializers.ModelSerializer):
     def get_rating(self, obj):
         return 10
 
+class TitleGetSerializer(serializers.ModelSerializer):
+
+    category = CategorySerializer(required=True)
+    genre = GenreSerializer(many=True, required=True)
+    rating = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Title
+        fields = '__all__'
+
+    def get_rating(self, obj):
+        return 10
+
 
 class SignupSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=True,

@@ -6,6 +6,7 @@ from rest_framework import status, viewsets, filters, mixins
 from rest_framework.decorators import api_view, action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.permissions import SAFE_METHODS
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
@@ -14,6 +15,7 @@ from reviews.models import Title, Category, Genre
 from .permissions import IsAdmin, IsAdminOrReadOnly
 from .serializers import (
     TitleSerializer,
+    TitleGetSerializer,
     CategorySerializer,
     GenreSerializer,
     SignupSerializer,
@@ -36,6 +38,12 @@ class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
     pagination_class = LimitOffsetPagination
     permission_classes = (IsAdminOrReadOnly,)
+
+    def get_serializer_class(self):
+        if self.request.method in SAFE_METHODS:
+            return TitleGetSerializer
+        else:
+            return TitleSerializer
 
 
 class CategoryViewSet(NoPATCHViewSet):
