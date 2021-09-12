@@ -13,7 +13,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = '__all__'
+        exclude = ['id']
         validators = [
             UniqueTogetherValidator(
                 queryset=Category.objects.all(),
@@ -27,7 +27,7 @@ class GenreSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Genre
-        fields = '__all__'
+        exclude = ['id']
         validators = [
             UniqueTogetherValidator(
                 queryset=Genre.objects.all(),
@@ -47,6 +47,19 @@ class TitleSerializer(serializers.ModelSerializer):
         many=True,
         queryset=Genre.objects.all()
     )
+    rating = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Title
+        fields = '__all__'
+
+    def get_rating(self, obj):
+        return 10
+
+class TitleGetSerializer(serializers.ModelSerializer):
+
+    category = CategorySerializer(required=True)
+    genre = GenreSerializer(many=True, required=True)
     rating = serializers.SerializerMethodField()
 
     class Meta:
