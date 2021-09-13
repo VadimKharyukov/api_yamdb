@@ -1,5 +1,8 @@
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import ValidationError
+from django.core.validators import (ValidationError,
+                                    MaxValueValidator,
+                                    MinValueValidator
+                                    )
 from django.db import models
 from django.utils import timezone
 
@@ -116,12 +119,14 @@ class GenreTitle(models.Model):
       
       
 class Review(models.Model):
-
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    title = models.ForeignKey(Title, on_delete=models.CASCADE,
-                              related_name='reviews'),
+    title = models.ForeignKey(
+        Title, on_delete=models.CASCADE, related_name='reviews', null=True
+    )
     text = models.TextField(max_length=3000)
-    score = models.ForeignKey('Score', on_delete=models.CASCADE)
+    score = models.IntegerField(default=1, validators=[
+        MaxValueValidator(10),
+        MinValueValidator(1)])
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
 
     class Meta:

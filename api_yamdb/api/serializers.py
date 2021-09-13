@@ -7,14 +7,17 @@ from reviews.models import CustomUser
 
 
 class ReviewSerializer(serializers.ModelSerializer):
+    title = serializers.SlugRelatedField(slug_field='name', read_only=True)
     author = serializers.SlugRelatedField(
-        slug_field='username', read_only=True
+        slug_field='username', read_only=True,
+        default=serializers.CurrentUserDefault()
     )
 
     class Meta:
         model = Review
         fields = '__all__'
         read_only_fields = ('author', 'id')
+# валидатор для проверки 2 ревью
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -25,7 +28,7 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         model = Comment
-        read_only_fields = ('author', 'id')
+        read_only_fields = ('author', 'id', 'review')
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -66,27 +69,20 @@ class TitleSerializer(serializers.ModelSerializer):
         many=True,
         queryset=Genre.objects.all()
     )
-    rating = serializers.SerializerMethodField()
 
     class Meta:
         model = Title
         fields = '__all__'
-
-    def get_rating(self, obj):
-        return 10
 
 
 class TitleGetSerializer(serializers.ModelSerializer):
-    category = CategorySerializer(required=True)
-    genre = GenreSerializer(many=True, required=True)
-    rating = serializers.SerializerMethodField()
+    category = CategorySerializer(read_only=True)
+    genre = GenreSerializer(many=True, read_only=True)
+    rating = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Title
         fields = '__all__'
-
-    def get_rating(self, obj):
-        return 10
 
 
 class SignupSerializer(serializers.ModelSerializer):
