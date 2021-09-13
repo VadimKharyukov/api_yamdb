@@ -17,7 +17,17 @@ class ReviewSerializer(serializers.ModelSerializer):
         model = Review
         fields = '__all__'
         read_only_fields = ('author', 'id')
-# валидатор для проверки 2 ревью
+
+    def validate(self, data):
+        request = self.context.get('request')
+        if request.method != 'POST':
+            return data
+        title = self.context.get('view').kwargs.get('title_id')
+        if Review.objects.filter(author=request.user, title=title).exists():
+            raise serializers.ValidationError(
+                'Больше одного обзора написать нельзя'
+            )
+        return data
 
 
 class CommentSerializer(serializers.ModelSerializer):

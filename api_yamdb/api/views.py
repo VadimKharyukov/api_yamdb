@@ -105,6 +105,7 @@ class TitleFilterSet(FilterSet):
         model = Title
         fields = ['genre', 'category', 'name', 'year']
 
+
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
     permission_classes = (IsAdminOrReadOnly,)
