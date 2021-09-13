@@ -10,25 +10,25 @@ class CustomUserAdmin(admin.ModelAdmin):
                     'first_name',
                     'role'
                     )
-    search_fields = ('username',)
+    search_fields = ('username', )
     empty_value_display = '-пусто-'
 
 
 class TitleAdmin(admin.ModelAdmin):
     list_display = ('pk', 'name', 'year', 'category')
-    search_fields = ('name',)
+    search_fields = ('name', )
     empty_value_display = '-пусто-'
 
 
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('pk', 'name', 'slug')
-    search_fields = ('name',)
+    search_fields = ('name', )
     empty_value_display = '-пусто-'
 
 
 class GenreAdmin(admin.ModelAdmin):
     list_display = ('pk', 'name', 'slug')
-    search_fields = ('name',)
+    search_fields = ('name', )
     empty_value_display = '-пусто-'
 
 

@@ -1,15 +1,15 @@
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
-from django_filters.rest_framework import DjangoFilterBackend, FilterSet
-from django_filters import CharFilter
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
+from django_filters import CharFilter
+from django_filters.rest_framework import DjangoFilterBackend, FilterSet
 from rest_framework import status, viewsets, filters, mixins
 from rest_framework.decorators import api_view, action
 from rest_framework.permissions import IsAuthenticated, SAFE_METHODS
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
-from django.db.models import Avg
 
 from reviews.models import Category, Genre, CustomUser, Review, Title
 from .permissions import (IsAdmin,
@@ -68,7 +68,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
     serializer_class = AdminSerializer
     queryset = CustomUser.objects.all()
     permission_classes = (IsAdmin, )
-    filter_backends = [filters.SearchFilter]
+    filter_backends = [filters.SearchFilter, ]
     lookup_field = 'username'
     search_fields = ('username',)
 
@@ -109,7 +109,7 @@ class TitleFilterSet(FilterSet):
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
     permission_classes = (IsAdminOrReadOnly,)
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, ]
     filterset_class = TitleFilterSet
     filterset_fields = ['slug', ]
 
@@ -124,7 +124,7 @@ class CategoryViewSet(NoPATCHViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer    
     lookup_field = 'slug'
-    filter_backends = [filters.SearchFilter]
+    filter_backends = [filters.SearchFilter, ]
     search_fields = ('name', )
     permission_classes = (IsAdminOrReadOnly,)
 
@@ -133,7 +133,7 @@ class GenreViewSet(NoPATCHViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer   
     lookup_field = 'slug'
-    filter_backends = [filters.SearchFilter]
+    filter_backends = [filters.SearchFilter, ]
     search_fields = ['name', ]
     permission_classes = (IsAdminOrReadOnly,)
 
