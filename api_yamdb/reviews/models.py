@@ -104,13 +104,9 @@ class GenreTitle(models.Model):
         null=True,
     )
 
- 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-#                 fields=['author', 'title'], name='unique_title_score'
-#             )
-#         ]
                 fields=['title', 'genre'],
                 name="unique_genre_title")
         ]
