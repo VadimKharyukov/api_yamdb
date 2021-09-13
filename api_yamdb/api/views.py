@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
+from django_filters.rest_framework import DjangoFilterBackend, FilterSet
+from django_filters import CharFilter
 from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets, filters, mixins
 from rest_framework.decorators import api_view, action
@@ -94,11 +96,21 @@ class NoPATCHViewSet(
     pass
 
 
+class TitleFilterSet(FilterSet):
+    genre = CharFilter(field_name='genre__slug', lookup_expr='icontains')
+    category = CharFilter(field_name='category__slug', lookup_expr='icontains')
+    name = CharFilter(field_name='name', lookup_expr='icontains')
+
+    class Meta:
+        model = Title
+        fields = ['genre', 'category', 'name', 'year']
+
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
     permission_classes = (IsAdminOrReadOnly,)
-
-    # фильтр кастомный
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = TitleFilterSet
+    filterset_fields = ['slug', ]
 
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
