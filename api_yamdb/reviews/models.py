@@ -84,7 +84,7 @@ class Title(models.Model):
         related_name="titles",
         blank=True, null=True
     )
-    description = models.TextField(blank=True)
+    description = models.TextField(blank=True, null=True)
     genre = models.ManyToManyField(Genre, through='GenreTitle')
 
     class Meta:
