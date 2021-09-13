@@ -116,8 +116,8 @@ class GenreTitle(models.Model):
 
     def __str__(self):
         return f'{self.genre} {self.title}'
-      
-      
+    
+
 class Review(models.Model):
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     title = models.ForeignKey(

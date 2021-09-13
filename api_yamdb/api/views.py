@@ -86,8 +86,8 @@ class CustomUserViewSet(viewsets.ModelViewSet):
                 return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
-          
-          
+
+
 class NoPATCHViewSet(
         mixins.ListModelMixin,
         mixins.CreateModelMixin,
@@ -122,7 +122,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 class CategoryViewSet(NoPATCHViewSet):
     queryset = Category.objects.all()
-    serializer_class = CategorySerializer    
+    serializer_class = CategorySerializer
     lookup_field = 'slug'
     filter_backends = [filters.SearchFilter, ]
     search_fields = ('name', )
@@ -131,7 +131,7 @@ class CategoryViewSet(NoPATCHViewSet):
 
 class GenreViewSet(NoPATCHViewSet):
     queryset = Genre.objects.all()
-    serializer_class = GenreSerializer   
+    serializer_class = GenreSerializer
     lookup_field = 'slug'
     filter_backends = [filters.SearchFilter, ]
     search_fields = ['name', ]

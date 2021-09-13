@@ -1,6 +1,7 @@
-import io, csv
+import csv
+import io
+
 from django.core.management.base import BaseCommand
-from reviews.models import Title, Category, Genre, GenreTitle
 
 DATA_PATH = 'static/data/'
 
@@ -14,7 +15,8 @@ class Command(BaseCommand):
         parser.add_argument('model_name')
 
     def handle(self, *args, **options):
-        with io.open(DATA_PATH + options['file_name'], mode="r", encoding="utf-8") as f_obj:
+        with io.open(DATA_PATH + options['file_name'],
+                     mode="r", encoding="utf-8") as f_obj:
             reader = csv.DictReader(f_obj, delimiter=',')
             for line in reader:
                 model = globals().get(options['model_name'])
