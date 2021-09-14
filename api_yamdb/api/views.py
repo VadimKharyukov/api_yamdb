@@ -17,7 +17,7 @@ from .permissions import (IsAdmin,
                           IsOwnerOrAdminOrModeratorOrReadOnly)
 from .serializers import (
     TitleSerializer,
-    TitleGetSerializer,
+    TitleListSerializer,
     CategorySerializer,
     GenreSerializer,
     SignupSerializer,
@@ -79,16 +79,14 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         if request.method == 'GET':
             serializer = UserSerializer(user, many=False)
             return Response(serializer.data)
-        if request.method == 'PATCH':
+        else:
             serializer = UserSerializer(user, data=request.data, partial=True)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class NoPATCHViewSet(
+class CreateListDestroyModelViewSet(
         mixins.ListModelMixin,
         mixins.CreateModelMixin,
         mixins.DestroyModelMixin,
@@ -103,7 +101,7 @@ class TitleFilterSet(FilterSet):
 
     class Meta:
         model = Title
-        fields = ['genre', 'category', 'name', 'year']
+        fields = ('genre', 'category', 'name', 'year')
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -111,16 +109,16 @@ class TitleViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = [DjangoFilterBackend, ]
     filterset_class = TitleFilterSet
-    filterset_fields = ['slug', ]
+    filterset_fields = ('slug', )
 
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
-            return TitleGetSerializer
+            return TitleListSerializer
         else:
             return TitleSerializer
 
 
-class CategoryViewSet(NoPATCHViewSet):
+class CategoryViewSet(CreateListDestroyModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     lookup_field = 'slug'
@@ -129,12 +127,12 @@ class CategoryViewSet(NoPATCHViewSet):
     permission_classes = (IsAdminOrReadOnly,)
 
 
-class GenreViewSet(NoPATCHViewSet):
+class GenreViewSet(CreateListDestroyModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     lookup_field = 'slug'
     filter_backends = [filters.SearchFilter, ]
-    search_fields = ['name', ]
+    search_fields = ('name', )
     permission_classes = (IsAdminOrReadOnly,)
 
 

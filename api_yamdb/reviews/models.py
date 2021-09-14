@@ -8,9 +8,9 @@ from django.utils import timezone
 
 
 class UserRoles:
-    USER = "user"
-    MODERATOR = "moderator"
-    ADMIN = "admin"
+    USER = 'user'
+    MODERATOR = 'moderator'
+    ADMIN = 'admin'
     choices = (
         (USER, USER),
         (MODERATOR, MODERATOR),
@@ -81,7 +81,7 @@ class Title(models.Model):
     )
     category = models.ForeignKey(
         Category, on_delete=models.SET_NULL,
-        related_name="titles",
+        related_name='titles',
         blank=True, null=True
     )
     description = models.TextField(blank=True, null=True)
@@ -111,7 +111,8 @@ class GenreTitle(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=['title', 'genre'],
-                name="unique_genre_title")
+                name='unique_genre_title'
+            )
         ]
 
     def __str__(self):
@@ -130,7 +131,7 @@ class Review(models.Model):
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
 
     class Meta:
-        ordering = ['-pub_date']
+        ordering = ('-pub_date', )
         constraints = [
             models.UniqueConstraint(
                 fields=['author', 'title'], name='unique_title_review'
@@ -146,7 +147,7 @@ class Comment(models.Model):
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
 
     class Meta:
-        ordering = ['-pub_date']
+        ordering = ('-pub_date', )
 
 
 class Score(models.Model):

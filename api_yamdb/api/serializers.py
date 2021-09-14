@@ -45,7 +45,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        exclude = ['id']
+        exclude = ('id', )
         validators = [
             UniqueTogetherValidator(
                 queryset=Category.objects.all(),
@@ -59,7 +59,7 @@ class GenreSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Genre
-        exclude = ['id']
+        exclude = ('id', )
         validators = [
             UniqueTogetherValidator(
                 queryset=Genre.objects.all(),
@@ -85,7 +85,7 @@ class TitleSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class TitleGetSerializer(serializers.ModelSerializer):
+class TitleListSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
     genre = GenreSerializer(many=True, read_only=True)
     rating = serializers.IntegerField(read_only=True)
