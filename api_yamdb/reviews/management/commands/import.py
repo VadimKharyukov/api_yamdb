@@ -3,7 +3,7 @@ import io
 
 from django.core.management.base import BaseCommand
 
-DATA_PATH = 'static/data/'
+DATA_PATH = 'data/'
 
 
 class Command(BaseCommand):

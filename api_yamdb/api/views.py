@@ -35,8 +35,6 @@ def signup(request):
     serializer.is_valid(raise_exception=True)
     email = serializer.data.get('email')
     username = serializer.data.get('username')
-    if username == 'me':
-        return Response(status=status.HTTP_400_BAD_REQUEST)
     user, create = CustomUser.objects.get_or_create(email=email,
                                                     username=username)
     confirmation_code = default_token_generator.make_token(user)
@@ -60,15 +58,18 @@ def token(request):
         user.save()
         token_user = AccessToken.for_user(user)
         return Response({'Ваш токен':
-                        f'{token_user}'}, status=status.HTTP_200_OK)
-    return Response('', status=status.HTTP_400_BAD_REQUEST)
+                        f'{token_user}'},
+                        status=status.HTTP_200_OK)
+    return Response({'Вы ввели неправильный код':
+                    f'{confirmation_code}'},
+                    status=status.HTTP_400_BAD_REQUEST)
 
 
 class CustomUserViewSet(viewsets.ModelViewSet):
     serializer_class = AdminSerializer
     queryset = CustomUser.objects.all()
     permission_classes = (IsAdmin, )
-    filter_backends = [filters.SearchFilter, ]
+    filter_backends = (filters.SearchFilter, )
     lookup_field = 'username'
     search_fields = ('username',)
 
@@ -79,11 +80,10 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         if request.method == 'GET':
             serializer = UserSerializer(user, many=False)
             return Response(serializer.data)
-        else:
-            serializer = UserSerializer(user, data=request.data, partial=True)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer = UserSerializer(user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class CreateListDestroyModelViewSet(
@@ -107,22 +107,21 @@ class TitleFilterSet(FilterSet):
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
     permission_classes = (IsAdminOrReadOnly,)
-    filter_backends = [DjangoFilterBackend, ]
+    filter_backends = (DjangoFilterBackend, )
     filterset_class = TitleFilterSet
     filterset_fields = ('slug', )
 
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
             return TitleListSerializer
-        else:
-            return TitleSerializer
+        return TitleSerializer
 
 
 class CategoryViewSet(CreateListDestroyModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     lookup_field = 'slug'
-    filter_backends = [filters.SearchFilter, ]
+    filter_backends = (filters.SearchFilter, )
     search_fields = ('name', )
     permission_classes = (IsAdminOrReadOnly,)
 
@@ -131,14 +130,14 @@ class GenreViewSet(CreateListDestroyModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     lookup_field = 'slug'
-    filter_backends = [filters.SearchFilter, ]
+    filter_backends = (filters.SearchFilter, )
     search_fields = ('name', )
     permission_classes = (IsAdminOrReadOnly,)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = [IsOwnerOrAdminOrModeratorOrReadOnly, ]
+    permission_classes = (IsOwnerOrAdminOrModeratorOrReadOnly, )
 
     def get_queryset(self):
         title = get_object_or_404(Title, id=self.kwargs['title_id'])
@@ -151,7 +150,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = [IsOwnerOrAdminOrModeratorOrReadOnly, ]
+    permission_classes = (IsOwnerOrAdminOrModeratorOrReadOnly, )
 
     def get_queryset(self):
         review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))

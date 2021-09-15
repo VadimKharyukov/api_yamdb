@@ -109,6 +109,13 @@ class SignupSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = ('email', 'username')
 
+    def validate_username(self, username):
+        if username == 'me':
+            raise serializers.ValidationError(
+                'Недоступное имя пользователя!введите другое'
+            )
+        return username
+
 
 class TokenSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=True)

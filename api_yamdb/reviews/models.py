@@ -110,7 +110,7 @@ class GenreTitle(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['title', 'genre'],
+                fields=('title', 'genre'),
                 name='unique_genre_title'
             )
         ]
@@ -134,7 +134,7 @@ class Review(models.Model):
         ordering = ('-pub_date', )
         constraints = [
             models.UniqueConstraint(
-                fields=['author', 'title'], name='unique_title_review'
+                fields=('author', 'title'), name='unique_title_review'
             )
         ]
 
